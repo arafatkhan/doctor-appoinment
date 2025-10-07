@@ -1,0 +1,64 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Payment Successful{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center p-5">
+                    <div class="text-success mb-4">
+                        <i class="fas fa-check-circle fa-5x"></i>
+                    </div>
+                    <h2 class="text-success mb-4">Payment Successful!</h2>
+                    <p class="lead">Your appointment has been confirmed.</p>
+                    
+                    {% if payment %}
+                    <div class="alert alert-info">
+                        <strong>Transaction ID:</strong> {{ payment.transaction_id }}
+                    </div>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <div class="text-start mb-4">
+                        <h5>Appointment Details:</h5>
+                        <p class="mb-1"><strong>Doctor:</strong> Dr. {{ appointment.doctor.name }}</p>
+                        <p class="mb-1"><strong>Date:</strong> {{ appointment.appointment_date }}</p>
+                        <p class="mb-1"><strong>Time:</strong> {{ appointment.appointment_time }}</p>
+                        <p class="mb-1"><strong>Amount Paid:</strong> ৳{{ appointment.amount }}</p>
+                    </div>
+                    
+                    {% if appointment.zoom_join_url %}
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-video"></i> Zoom Meeting Link Ready!</h6>
+                        <p class="mb-2">Your online consultation meeting is ready</p>
+                        <a href="{{ appointment.zoom_join_url }}" target="_blank" class="btn btn-success">
+                            <i class="fas fa-video"></i> Join Zoom Meeting
+                        </a>
+                        {% if appointment.zoom_password %}
+                        <p class="mb-0 mt-2 small"><strong>Meeting Password:</strong> {{ appointment.zoom_password }}</p>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle"></i> Zoom Link Status</h6>
+                        <p class="mb-0">Your Zoom meeting link is being generated. Please check the appointment details page in a moment or contact support.</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Go to Dashboard
+                        </a>
+                        <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-eye"></i> View Appointment
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

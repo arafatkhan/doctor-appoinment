@@ -1,0 +1,312 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Book Appointment{% endblock %}
+
+{% block extra_css %}
+<style>
+.time-slot-badge {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.time-slot-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    opacity: 0.9;
+}
+.time-slot-badge:active {
+    transform: translateY(0);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-calendar-plus"></i> Book New Appointment</h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Display form errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Doctor *</label>
+                            {{ form.doctor }}
+                            {% if form.doctor.errors %}
+                                <div class="text-danger">{{ form.doctor.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Available Time Slots Display -->
+                        <div id="availableSlots" class="mb-4" style="display: none;">
+                            <div class="card bg-light border-success">
+                                <div class="card-body">
+                                    <h6 class="card-title text-success">
+                                        <i class="fas fa-clock"></i> Doctor's Available Time Slots
+                                    </h6>
+                                    <p class="text-muted small mb-2">
+                                        <i class="fas fa-info-circle"></i> Click on a time slot to automatically fill the date and time fields
+                                    </p>
+                                    <div id="slotsContent" class="mt-2">
+                                        <!-- Slots will be loaded here via AJAX -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Appointment Date *</label>
+                                {{ form.appointment_date }}
+                                <small class="form-text text-muted">Select a date based on doctor's schedule</small>
+                                {% if form.appointment_date.errors %}
+                                    <div class="text-danger">{{ form.appointment_date.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Appointment Time *</label>
+                                {{ form.appointment_time }}
+                                <small class="form-text text-muted">Select time within doctor's available slots</small>
+                                {% if form.appointment_time.errors %}
+                                    <div class="text-danger">{{ form.appointment_time.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Reason for Appointment *</label>
+                            {{ form.reason }}
+                            {% if form.reason.errors %}
+                                <div class="text-danger">{{ form.reason.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Symptoms (Optional)</label>
+                            {{ form.symptoms }}
+                            <small class="form-text text-muted">Describe your symptoms in detail</small>
+                            {% if form.symptoms.errors %}
+                                <div class="text-danger">{{ form.symptoms.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>Note:</strong> After booking, you will receive a Zoom meeting link for your consultation. Please complete the payment to confirm your appointment.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-check"></i> Book Appointment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // When doctor is selected, load available time slots
+    $('#id_doctor').change(function() {
+        const doctorId = $(this).val();
+        
+        if (doctorId) {
+            // Show loading
+            $('#availableSlots').show();
+            $('#slotsContent').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading time slots...</div>');
+            
+            // Fetch time slots
+            $.ajax({
+                url: '/doctor/' + doctorId + '/time-slots/',
+                method: 'GET',
+                success: function(response) {
+                    if (response.slots && response.slots.length > 0) {
+                        let html = '<div class="row g-2">';
+                        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                        
+                        // Group slots by weekday
+                        const slotsByDay = {};
+                        response.slots.forEach(function(slot) {
+                            if (!slotsByDay[slot.weekday]) {
+                                slotsByDay[slot.weekday] = [];
+                            }
+                            slotsByDay[slot.weekday].push(slot);
+                        });
+                        
+                        // Display slots as clickable badges
+                        for (let day in slotsByDay) {
+                            html += '<div class="col-md-12 mb-2">';
+                            html += '<strong>' + days[day] + ':</strong> ';
+                            slotsByDay[day].forEach(function(slot, index) {
+                                if (index > 0) html += ' ';
+                                html += '<span class="badge bg-primary time-slot-badge" ' +
+                                       'data-weekday="' + slot.weekday + '" ' +
+                                       'data-day-name="' + days[slot.weekday] + '" ' +
+                                       'data-start="' + slot.start_time + '" ' +
+                                       'data-end="' + slot.end_time + '" ' +
+                                       'style="cursor: pointer; font-size: 0.95rem; padding: 8px 12px; margin: 2px;">' +
+                                       '<i class="fas fa-clock"></i> ' + slot.start_time + ' - ' + slot.end_time +
+                                       '</span>';
+                            });
+                            html += '</div>';
+                        }
+                        html += '</div>';
+                        html += '<div class="alert alert-info mt-3 mb-0"><i class="fas fa-hand-pointer"></i> <strong>Tip:</strong> Click on any time slot above to select it</div>';
+                        
+                        $('#slotsContent').html(html);
+                        
+                        // Add click event to time slot badges
+                        $('.time-slot-badge').click(function() {
+                            const weekday = parseInt($(this).data('weekday'));
+                            const dayName = $(this).data('day-name');
+                            const startTime = $(this).data('start');
+                            const endTime = $(this).data('end');
+                            
+                            // Remove selection from other badges
+                            $('.time-slot-badge').removeClass('bg-success').addClass('bg-primary');
+                            
+                            // Mark this badge as selected
+                            $(this).removeClass('bg-primary').addClass('bg-success');
+                            
+                            // Calculate next available date for this weekday
+                            const today = new Date();
+                            const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+                            
+                            // Convert weekday (0 = Monday) to JS day (1 = Monday)
+                            const targetDay = weekday === 6 ? 0 : weekday + 1;
+                            
+                            // Calculate days to add
+                            let daysToAdd = targetDay - currentDay;
+                            if (daysToAdd <= 0) {
+                                daysToAdd += 7; // Next week
+                            }
+                            
+                            const appointmentDate = new Date(today);
+                            appointmentDate.setDate(today.getDate() + daysToAdd);
+                            
+                            // Format date as YYYY-MM-DD for input
+                            const year = appointmentDate.getFullYear();
+                            const month = String(appointmentDate.getMonth() + 1).padStart(2, '0');
+                            const day = String(appointmentDate.getDate()).padStart(2, '0');
+                            const formattedDate = year + '-' + month + '-' + day;
+                            
+                            // Set appointment date
+                            $('#id_appointment_date').val(formattedDate);
+                            
+                            // Set appointment time (start time)
+                            $('#id_appointment_time').val(startTime);
+                            
+                            // Show success message
+                            const successMsg = $('<div class="alert alert-success mt-2 alert-dismissible fade show" role="alert">' +
+                                '<i class="fas fa-check-circle"></i> <strong>Selected!</strong> ' +
+                                dayName + ' at ' + startTime + ' (Date: ' + formattedDate + ')' +
+                                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                                '</div>');
+                            
+                            // Remove old success messages
+                            $('#availableSlots .alert-success').remove();
+                            
+                            // Add new success message
+                            $('#availableSlots .card-body').append(successMsg);
+                            
+                            // Scroll to date/time fields
+                            $('html, body').animate({
+                                scrollTop: $('#id_appointment_date').offset().top - 100
+                            }, 500);
+                        });
+                    } else {
+                        $('#slotsContent').html('<p class="text-warning mb-0"><i class="fas fa-exclamation-triangle"></i> No time slots available for this doctor. Please contact the doctor to set up their schedule.</p>');
+                    }
+                },
+                error: function() {
+                    $('#slotsContent').html('<p class="text-danger mb-0"><i class="fas fa-times"></i> Error loading time slots. Please try again.</p>');
+                }
+            });
+        } else {
+            $('#availableSlots').hide();
+        }
+    });
+    
+    // Form validation before submission
+    $('form').submit(function(e) {
+        let isValid = true;
+        let errorMessages = [];
+        
+        // Check required fields
+        const doctor = $('#id_doctor').val();
+        const appointmentDate = $('#id_appointment_date').val();
+        const appointmentTime = $('#id_appointment_time').val();
+        const reason = $('#id_reason').val().trim();
+        
+        if (!doctor) {
+            errorMessages.push('Please select a doctor.');
+            isValid = false;
+        }
+        
+        if (!appointmentDate) {
+            errorMessages.push('Please select an appointment date.');
+            isValid = false;
+        }
+        
+        if (!appointmentTime) {
+            errorMessages.push('Please select an appointment time.');
+            isValid = false;
+        }
+        
+        if (!reason) {
+            errorMessages.push('Please provide a reason for the appointment.');
+            isValid = false;
+        }
+        
+        // Check date is not in the past
+        if (appointmentDate) {
+            const selectedDate = new Date(appointmentDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                errorMessages.push('Appointment date cannot be in the past.');
+                isValid = false;
+            }
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            
+            // Show errors
+            let errorHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+            errorHtml += '<strong><i class="fas fa-exclamation-triangle"></i> Please fix the following errors:</strong><ul class="mb-0 mt-2">';
+            errorMessages.forEach(function(msg) {
+                errorHtml += '<li>' + msg + '</li>';
+            });
+            errorHtml += '</ul>';
+            errorHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            errorHtml += '</div>';
+            
+            // Remove old errors and add new ones
+            $('.card-body .alert-danger').remove();
+            $('.card-body').prepend(errorHtml);
+            
+            // Scroll to top to show errors
+            $('html, body').animate({
+                scrollTop: $('.card').offset().top - 20
+            }, 500);
+        }
+    });
+});
+</script>
+{% endblock %}

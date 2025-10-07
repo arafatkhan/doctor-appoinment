@@ -1,0 +1,108 @@
+🎯 HOURLY APPOINTMENT LIMIT TESTING GUIDE
+==========================================
+
+✅ STATUS: 25 APPOINTMENTS CREATED FOR TESTING
+==============================================
+
+📋 Test Setup Complete:
+- Doctor: Ahmed Hossain (ID: 6)
+- Date: October 15, 2025 
+- Time: 2:00 PM (14:00)
+- Current Count: 25/20 (OVER LIMIT!)
+
+🔥 HOW TO TEST THE LIMIT SYSTEM:
+==============================
+
+1. **LOGIN AS PATIENT**:
+   - Go to: http://localhost:8000/login/
+   - Username: patient1
+   - Password: patient123
+
+2. **TRY TO BOOK APPOINTMENT**:
+   - Go to: http://localhost:8000/appointments/book/
+   - Select Doctor: Ahmed Hossain
+   - Select Date: October 15, 2025 (future date)
+   - Select Time: 2:00 PM (14:00)
+   - Fill reason and submit
+
+3. **EXPECTED RESULT**:
+   You should see this error message:
+   "⚠️ ডাক্তার Ahmed Hossain এর 02:00 PM - 03:00 PM এর মধ্যে ইতিমধ্যে 20টি appointment বুক হয়ে গেছে। অন্য সময় বেছে নিন বা পরবর্তী ঘণ্টার জন্য চেষ্টা করুন।"
+
+4. **CHECK DOCTOR DASHBOARD**:
+   - Login as doctor: ahmed_ali / doctor123
+   - Go to: http://localhost:8000/doctor/dashboard/
+   - You should see hourly statistics showing FULL status
+
+🎯 ALTERNATIVE TESTING:
+======================
+
+Try Different Times That Should Work:
+- 1:00 PM (13:00) ✅ Should work
+- 3:00 PM (15:00) ✅ Should work  
+- 4:00 PM (16:00) ✅ Should work
+
+Try Same Time (Should Fail):
+- 2:00 PM (14:00) ❌ Should show limit error
+
+🔄 RESET TESTING DATA:
+====================
+
+To clear test appointments and start fresh:
+```
+python test_hourly_limits.py
+```
+This will create fresh test data.
+
+📊 MONITORING:
+=============
+
+Watch the terminal where server is running:
+- You'll see form validation messages
+- Debug output shows when limits are hit
+- Error messages appear in Bengali
+
+🎉 SUCCESS CRITERIA:
+==================
+
+✅ Frontend shows Bengali error message when limit exceeded
+✅ Doctor dashboard shows hourly statistics  
+✅ Different hours allow new appointments
+✅ Same over-limit hour blocks new bookings
+
+💡 TECHNICAL DETAILS:
+===================
+
+- Backend validation in forms.py
+- Hourly calculation: 2:00-3:00 PM = 1 hour slot
+- Count includes: status='pending' OR 'confirmed'
+- Limit: Exactly 20 appointments per hour
+- Multi-patient same time: NOW ALLOWED (unique constraint removed)
+
+🔧 TROUBLESHOOTING:
+==================
+
+If limit not working:
+1. Check terminal for Django errors
+2. Verify server is running: http://localhost:8000/
+3. Clear browser cache
+4. Check database: 25 appointments exist for 2:00 PM slot
+
+📞 QUICK TEST COMMAND:
+=====================
+
+Run this to see current appointment count:
+```
+python manage.py shell
+from appointments.models import Appointment
+count = Appointment.objects.filter(
+    doctor_id=6, 
+    appointment_date='2025-10-15',
+    appointment_time='14:00:00'
+).count()
+print(f"Current count: {count}")
+```
+
+================================
+Status: READY FOR TESTING! 🚀
+================================

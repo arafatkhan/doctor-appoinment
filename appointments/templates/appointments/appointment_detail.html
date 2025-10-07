@@ -1,0 +1,169 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Appointment Details{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-calendar-check"></i> Appointment Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Doctor</h6>
+                            <p class="mb-0"><strong>Dr. {{ appointment.doctor.name }}</strong></p>
+                            <small class="text-muted">{{ appointment.doctor.specialization }}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Appointment ID</h6>
+                            <p><strong>#{{ appointment.id }}</strong></p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Date</h6>
+                            <p><i class="fas fa-calendar"></i> {{ appointment.appointment_date }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Time</h6>
+                            <p><i class="fas fa-clock"></i> {{ appointment.appointment_time }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Status</h6>
+                            <span class="status-badge status-{{ appointment.status }}">
+                                {{ appointment.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Payment Status</h6>
+                            <span class="status-badge payment-{{ appointment.payment_status }}">
+                                {{ appointment.get_payment_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-muted">Reason</h6>
+                        <p>{{ appointment.reason }}</p>
+                    </div>
+                    
+                    {% if appointment.symptoms %}
+                    <div class="mb-3">
+                        <h6 class="text-muted">Symptoms</h6>
+                        <p>{{ appointment.symptoms }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if appointment.payment_status == 'paid' %}
+                        {% if appointment.zoom_join_url %}
+                        <hr>
+                        <div class="alert alert-success border-success">
+                            <h5 class="alert-heading"><i class="fas fa-video"></i> Your Zoom Meeting is Ready!</h5>
+                            <p class="mb-2">Click the button below to join your online consultation:</p>
+                            <a href="{{ appointment.zoom_join_url }}" target="_blank" class="btn btn-success">
+                                <i class="fas fa-video"></i> Join Zoom Meeting Now
+                            </a>
+                            {% if appointment.zoom_password %}
+                            <hr class="my-2">
+                            <p class="mb-0"><i class="fas fa-lock"></i> <strong>Meeting Password:</strong> <code>{{ appointment.zoom_password }}</code></p>
+                            {% endif %}
+                            <hr class="my-2">
+                            <p class="mb-0 small text-muted"><i class="fas fa-info-circle"></i> Join at your scheduled appointment time: {{ appointment.appointment_date }} at {{ appointment.appointment_time }}</p>
+                        </div>
+                        {% else %}
+                        <hr>
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-clock"></i> Zoom Link Status</h6>
+                            <p class="mb-2">Your Zoom meeting link is being generated. Please refresh this page in a moment.</p>
+                            <a href="{% url 'generate_zoom_link' appointment.id %}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-sync"></i> Generate Zoom Link Now
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        {% if appointment.zoom_join_url %}
+                        <hr>
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-video"></i> Zoom Meeting Link</h6>
+                            <p class="mb-2 small">Your Zoom link is ready but you need to complete payment to access it.</p>
+                            <a href="{% url 'initiate_payment' appointment.id %}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-credit-card"></i> Complete Payment to Access
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if appointment.status not in 'completed,cancelled' %}
+            <div class="card">
+                <div class="card-body">
+                    <h5>Actions</h5>
+                    {% if appointment.payment_status != 'paid' %}
+                    <a href="{% url 'initiate_payment' appointment.id %}" class="btn btn-warning">
+                        <i class="fas fa-credit-card"></i> Make Payment
+                    </a>
+                    {% endif %}
+                    
+                    {% if appointment.status not in 'completed,cancelled' %}
+                    <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn-danger">
+                        <i class="fas fa-times"></i> Cancel Appointment
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Consultation Fee:</span>
+                        <strong>৳{{ appointment.amount }}</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Total:</strong></span>
+                        <strong class="text-success">৳{{ appointment.amount }}</strong>
+                    </div>
+                    
+                    {% if appointment.payment_status == 'paid' %}
+                    <div class="alert alert-success mt-3 mb-0">
+                        <i class="fas fa-check-circle"></i> Payment Completed
+                    </div>
+                    {% else %}
+                    <a href="{% url 'initiate_payment' appointment.id %}" class="btn btn-warning w-100 mt-3">
+                        <i class="fas fa-credit-card"></i> Pay Now
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Doctor Information</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><i class="fas fa-envelope"></i> {{ appointment.doctor.email }}</p>
+                    <p class="mb-0"><i class="fas fa-phone"></i> {{ appointment.doctor.phone }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Register - Patient Appointment System{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-user-plus"></i> Patient Registration</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Username *</label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="text-danger">{{ form.username.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email *</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name *</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name *</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number *</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger">{{ form.phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date of Birth</label>
+                                {{ form.date_of_birth }}
+                                <div id="ageDisplay" class="text-muted mt-1" style="font-size: 0.9rem; display: none;">
+                                    <i class="fas fa-birthday-cake"></i> Age: <strong><span id="calculatedAge"></span> years</strong>
+                                </div>
+                                {% if form.date_of_birth.errors %}
+                                    <div class="text-danger">{{ form.date_of_birth.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            {{ form.address }}
+                            {% if form.address.errors %}
+                                <div class="text-danger">{{ form.address.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Medical History (Optional)</label>
+                            {{ form.medical_history }}
+                            <small class="form-text text-muted">Any existing medical conditions, allergies, or medications</small>
+                            {% if form.medical_history.errors %}
+                                <div class="text-danger">{{ form.medical_history.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Password *</label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                    <div class="text-danger">{{ form.password1.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">At least 8 characters</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Confirm Password *</label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                    <div class="text-danger">{{ form.password2.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-user-plus"></i> Register
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Get date of birth input field
+    const dobInput = $('#id_date_of_birth');
+    const ageDisplay = $('#ageDisplay');
+    const calculatedAge = $('#calculatedAge');
+    
+    // Function to calculate age from date of birth
+    function calculateAge(birthDate) {
+        const today = new Date();
+        const birth = new Date(birthDate);
+        
+        // Check if valid date
+        if (isNaN(birth.getTime())) {
+            return null;
+        }
+        
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        
+        // Adjust age if birthday hasn't occurred this year
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        
+        return age;
+    }
+    
+    // Function to update age display
+    function updateAgeDisplay() {
+        const dobValue = dobInput.val();
+        
+        if (dobValue) {
+            const age = calculateAge(dobValue);
+            
+            if (age !== null && age >= 0) {
+                calculatedAge.text(age);
+                ageDisplay.slideDown(200);
+                
+                // Change color based on age
+                if (age < 18) {
+                    ageDisplay.removeClass('text-muted text-success').addClass('text-info');
+                } else if (age >= 60) {
+                    ageDisplay.removeClass('text-muted text-info').addClass('text-success');
+                } else {
+                    ageDisplay.removeClass('text-info text-success').addClass('text-muted');
+                }
+            } else {
+                ageDisplay.slideUp(200);
+            }
+        } else {
+            ageDisplay.slideUp(200);
+        }
+    }
+    
+    // Update age when date changes
+    dobInput.on('change', updateAgeDisplay);
+    dobInput.on('blur', updateAgeDisplay);
+    
+    // Check if there's already a value (e.g., form validation error)
+    if (dobInput.val()) {
+        updateAgeDisplay();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,74 @@
+STEP BY STEP SETUP INSTRUCTIONS
+================================
+
+STEP 1: Python Check করুন
+--------------------------
+Command: python --version
+আপনার Python 3.8+ installed থাকতে হবে।
+
+STEP 2: Virtual Environment তৈরি করুন
+--------------------------------------
+Command: python -m venv venv
+এটি একটি virtual environment তৈরি করবে।
+
+STEP 3: Virtual Environment Activate করুন
+------------------------------------------
+Command: venv\Scripts\activate
+Terminal এ (venv) দেখা যাবে।
+
+STEP 4: Dependencies Install করুন
+----------------------------------
+Command: pip install -r requirements.txt
+সব প্রয়োজনীয় packages install হবে।
+
+STEP 5: Django Project তৈরি করুন
+---------------------------------
+Command: django-admin startproject appointment_system .
+একটি Django project তৈরি হবে।
+
+STEP 6: Appointments App তৈরি করুন
+-----------------------------------
+Command: python manage.py startapp appointments
+Main application তৈরি হবে।
+
+STEP 7: Database Migrate করুন
+------------------------------
+Command: python manage.py makemigrations
+Command: python manage.py migrate
+SQLite database তৈরি হবে।
+
+STEP 8: Admin User তৈরি করুন
+-----------------------------
+Command: python manage.py createsuperuser
+Username, email, password দিন।
+
+STEP 9: Server চালু করুন
+------------------------
+Command: python manage.py runserver
+Browser এ http://localhost:8000 open করুন।
+
+STEP 10: bKash Credentials পান
+-------------------------------
+1. https://developer.bka.sh/ এ যান
+2. Sign up করুন
+3. Sandbox credentials পান:
+   - App Key
+   - App Secret
+   - Username
+   - Password
+4. .env file এ add করুন
+
+IMPORTANT NOTES:
+----------------
+- Zoom credentials already configured
+- bKash sandbox credentials এর জন্য developer.bka.sh এ register করতে হবে
+- Email notifications এর জন্য Gmail App Password use করুন
+- Production এ DEBUG=False করতে হবে
+
+NEXT STEPS AFTER SETUP:
+-----------------------
+1. Admin panel access করুন: http://localhost:8000/admin
+2. Doctors/Time slots add করুন
+3. Test appointment booking করুন
+4. Payment testing করুন (sandbox mode)
+5. Zoom meeting link test করুন

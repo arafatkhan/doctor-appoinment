@@ -1,0 +1,249 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Appointment Details - Doctor{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Patient Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> Patient Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Full Name</h6>
+                            <p><strong>{{ appointment.patient.user.get_full_name }}</strong></p>
+                        </div>
+                        <div class="col-md-3">
+                            <h6 class="text-muted">Age</h6>
+                            <p>{{ appointment.patient.age|default:"N/A" }} years</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h6 class="text-muted">Gender</h6>
+                            <p>{{ appointment.patient.gender|default:"N/A" }}</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Phone</h6>
+                            <p><i class="fas fa-phone"></i> {{ appointment.patient.phone }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Email</h6>
+                            <p><i class="fas fa-envelope"></i> {{ appointment.patient.user.email }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if appointment.patient.address %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="text-muted">Address</h6>
+                            <p>{{ appointment.patient.address }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Medical Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-heartbeat"></i> Medical Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Blood Group</h6>
+                            <p>
+                                {% if appointment.patient.blood_group %}
+                                    <span class="badge bg-danger">{{ appointment.patient.blood_group }}</span>
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Date of Birth</h6>
+                            <p>{{ appointment.patient.date_of_birth|default:"N/A" }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if appointment.patient.medical_history %}
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="text-muted">Medical History</h6>
+                            <div class="alert alert-info">
+                                {{ appointment.patient.medical_history }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if appointment.patient.allergies %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="text-muted"><i class="fas fa-exclamation-triangle text-warning"></i> Allergies</h6>
+                            <div class="alert alert-warning">
+                                {{ appointment.patient.allergies }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Appointment Details -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Appointment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Date</h6>
+                            <p><i class="fas fa-calendar"></i> {{ appointment.appointment_date }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Time</h6>
+                            <p><i class="fas fa-clock"></i> {{ appointment.appointment_time }}</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="text-muted">Reason for Visit</h6>
+                            <p>{{ appointment.reason }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if appointment.symptoms %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="text-muted">Symptoms</h6>
+                            <p>{{ appointment.symptoms }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Status</h6>
+                            <span class="badge bg-{{ appointment.status }} p-2">
+                                {{ appointment.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Payment Status</h6>
+                            <span class="badge bg-{{ appointment.payment_status }} p-2">
+                                {{ appointment.get_payment_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zoom Meeting -->
+            {% if appointment.zoom_join_url %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-video"></i> Zoom Meeting</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p class="mb-3">Start the consultation meeting with {{ appointment.patient.user.get_full_name }}</p>
+                    <a href="{{ appointment.zoom_start_url }}" target="_blank" class="btn btn-success btn-lg">
+                        <i class="fas fa-video"></i> Start Zoom Meeting as Host
+                    </a>
+                    {% if appointment.zoom_password %}
+                    <p class="mt-3"><strong>Meeting Password:</strong> <code>{{ appointment.zoom_password }}</code></p>
+                    {% endif %}
+                    <hr>
+                    <small class="text-muted">
+                        Patient Join URL: {{ appointment.zoom_join_url }}
+                    </small>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <!-- Quick Stats -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">Appointment Info</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Appointment ID:</strong><br>#{{ appointment.id }}</p>
+                    <p><strong>Booked On:</strong><br>{{ appointment.created_at|date:"F d, Y" }}</p>
+                    <p><strong>Consultation Fee:</strong><br>৳{{ appointment.amount }}</p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    {% if appointment.status == 'confirmed' %}
+                    <form method="post" action="{% url 'doctor_complete_appointment' appointment.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-block w-100 mb-2">
+                            <i class="fas fa-check"></i> Mark as Completed
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    {% if appointment.status == 'pending' %}
+                    <form method="post" action="{% url 'doctor_confirm_appointment' appointment.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info btn-block w-100 mb-2">
+                            <i class="fas fa-check-circle"></i> Confirm Appointment
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary btn-block w-100">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Contact Patient -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Contact Patient</h5>
+                </div>
+                <div class="card-body">
+                    <a href="tel:{{ appointment.patient.phone }}" class="btn btn-outline-primary btn-block w-100 mb-2">
+                        <i class="fas fa-phone"></i> Call Patient
+                    </a>
+                    <a href="mailto:{{ appointment.patient.user.email }}" class="btn btn-outline-success btn-block w-100">
+                        <i class="fas fa-envelope"></i> Email Patient
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.badge.bg-paid { background-color: #28a745 !important; }
+.badge.bg-pending { background-color: #ffc107 !important; color: #000; }
+.badge.bg-failed { background-color: #dc3545 !important; }
+.badge.bg-confirmed { background-color: #17a2b8 !important; }
+.badge.bg-completed { background-color: #28a745 !important; }
+.badge.bg-cancelled { background-color: #6c757d !important; }
+</style>
+{% endblock %}

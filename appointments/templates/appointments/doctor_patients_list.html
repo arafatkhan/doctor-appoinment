@@ -1,0 +1,72 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}All Patients - Dr. {{ doctor.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-users"></i> All Patients - Dr. {{ doctor.name }}</h4>
+        </div>
+        <div class="card-body">
+            {% if patients %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Contact</th>
+                            <th>Age / Gender</th>
+                            <th>Blood Group</th>
+                            <th>Total Appointments</th>
+                            <th>Last Visit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td><strong>{{ patient.user.get_full_name }}</strong></td>
+                            <td>
+                                <small>
+                                    <i class="fas fa-phone"></i> {{ patient.phone }}<br>
+                                    <i class="fas fa-envelope"></i> {{ patient.user.email }}
+                                </small>
+                            </td>
+                            <td>
+                                {{ patient.age|default:"N/A" }} / {{ patient.gender|default:"N/A" }}
+                            </td>
+                            <td>
+                                {% if patient.blood_group %}
+                                    <span class="badge bg-danger">{{ patient.blood_group }}</span>
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ patient.appointment_set.count }}</td>
+                            <td>
+                                {% with patient.appointment_set.last as last_apt %}
+                                    {% if last_apt %}
+                                        {{ last_apt.appointment_date }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">No patients yet</p>
+            {% endif %}
+            
+            <div class="mt-4">
+                <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

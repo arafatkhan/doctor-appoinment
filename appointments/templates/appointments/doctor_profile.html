@@ -1,0 +1,88 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Profile - Dr. {{ doctor.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-edit"></i> Doctor Profile</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Full Name</h6>
+                            <p><strong>Dr. {{ doctor.name }}</strong></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Specialization</h6>
+                            <p>{{ doctor.specialization }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Phone</h6>
+                            <p><i class="fas fa-phone"></i> {{ doctor.phone }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Email</h6>
+                            <p><i class="fas fa-envelope"></i> {{ doctor.email }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Consultation Fee</h6>
+                            <p><strong>৳{{ doctor.consultation_fee }}</strong></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Status</h6>
+                            <p>
+                                {% if doctor.is_available %}
+                                    <span class="badge bg-success">Available</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Not Available</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if doctor.qualifications %}
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <h6 class="text-muted">Qualifications</h6>
+                            <p>{{ doctor.qualifications }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if doctor.experience %}
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <h6 class="text-muted">Experience</h6>
+                            <p>{{ doctor.experience }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> To edit your profile, please use the Admin Panel: 
+                        <a href="/admin/appointments/doctor/{{ doctor.id }}/change/" class="btn btn-sm btn-primary">Edit Profile</a>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

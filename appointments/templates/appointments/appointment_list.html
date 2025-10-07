@@ -1,0 +1,102 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}My Appointments{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-calendar-alt"></i> My Appointments</h2>
+        <a href="{% url 'book_appointment' %}" class="btn btn-primary">
+            <i class="fas fa-calendar-plus"></i> Book New
+        </a>
+    </div>
+    
+    <!-- Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="btn-group" role="group">
+                <a href="{% url 'appointment_list' %}" class="btn {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    All
+                </a>
+                <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Pending
+                </a>
+                <a href="?status=confirmed" class="btn {% if status_filter == 'confirmed' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Confirmed
+                </a>
+                <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Completed
+                </a>
+                <a href="?status=cancelled" class="btn {% if status_filter == 'cancelled' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Cancelled
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Appointments List -->
+    <div class="card">
+        <div class="card-body">
+            {% if appointments %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>#{{ appointment.id }}</td>
+                            <td>
+                                <strong>Dr. {{ appointment.doctor.name }}</strong><br>
+                                <small class="text-muted">{{ appointment.doctor.specialization }}</small>
+                            </td>
+                            <td>{{ appointment.appointment_date }}</td>
+                            <td>{{ appointment.appointment_time }}</td>
+                            <td>
+                                <span class="status-badge status-{{ appointment.status }}">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge payment-{{ appointment.payment_status }}">
+                                    {{ appointment.get_payment_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                {% if appointment.zoom_join_url and appointment.payment_status == 'paid' %}
+                                <a href="{{ appointment.zoom_join_url }}" target="_blank" class="btn btn-sm btn-success">
+                                    <i class="fas fa-video"></i> Join
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                <h5>No appointments found</h5>
+                <p class="text-muted">Book your first appointment to get started</p>
+                <a href="{% url 'book_appointment' %}" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus"></i> Book Appointment
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

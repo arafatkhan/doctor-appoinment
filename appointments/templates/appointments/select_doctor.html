@@ -1,0 +1,50 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Select Doctor{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0"><i class="fas fa-user-md"></i> Select Doctor Profile</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-center text-muted mb-4">
+                        Please select which doctor's dashboard you want to access
+                    </p>
+                    
+                    <div class="row">
+                        {% for doctor in doctors %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+                                    <h5>Dr. {{ doctor.name }}</h5>
+                                    <p class="text-muted">{{ doctor.specialization }}</p>
+                                    <p class="small">
+                                        <i class="fas fa-phone"></i> {{ doctor.phone }}<br>
+                                        <i class="fas fa-envelope"></i> {{ doctor.email }}
+                                    </p>
+                                    <a href="{% url 'doctor_dashboard' %}?doctor_id={{ doctor.id }}" 
+                                       class="btn btn-primary btn-block w-100">
+                                        <i class="fas fa-sign-in-alt"></i> Access Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if not doctors %}
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle"></i> No doctors available
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

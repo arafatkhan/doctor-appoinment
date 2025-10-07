@@ -1,0 +1,74 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Doctor Details{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary text-white rounded-circle me-4" style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-md fa-3x"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-1">Dr. {{ doctor.name }}</h3>
+                            <p class="text-muted mb-0">{{ doctor.specialization }}</p>
+                            <span class="badge bg-success mt-2">Available</span>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h5 class="mb-3">Contact Information</h5>
+                    <p>
+                        <i class="fas fa-envelope text-primary"></i> {{ doctor.email }}<br>
+                        <i class="fas fa-phone text-primary"></i> {{ doctor.phone }}
+                    </p>
+                    
+                    <hr>
+                    
+                    <h5 class="mb-3">Consultation Fee</h5>
+                    <h4 class="text-success">৳{{ doctor.consultation_fee }}</h4>
+                    
+                    {% if user.is_authenticated %}
+                    <div class="mt-4">
+                        <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-calendar-plus"></i> Book Appointment
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="mt-4">
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                            Login to Book Appointment
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Available Time Slots</h5>
+                </div>
+                <div class="card-body">
+                    {% if time_slots %}
+                        {% for slot in time_slots %}
+                        <div class="mb-2">
+                            <strong>{{ slot.get_weekday_display }}</strong><br>
+                            {{ slot.start_time }} - {{ slot.end_time }}
+                        </div>
+                        <hr>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No time slots available. Please contact the doctor directly.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
