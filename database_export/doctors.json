@@ -1,0 +1,121 @@
+[
+{
+  "model": "appointments.doctor",
+  "pk": 1,
+  "fields": {
+    "user": 8,
+    "name": "Ahmed Hossain",
+    "specialization": "General Physician",
+    "email": "ahmed.hossain@hospital.com",
+    "phone": "01711111111",
+    "consultation_fee": "500.00",
+    "qualification": "",
+    "experience_years": 0,
+    "bio": "",
+    "is_available": true,
+    "created_at": "2025-10-05T19:20:00.156Z"
+  }
+},
+{
+  "model": "appointments.doctor",
+  "pk": 6,
+  "fields": {
+    "user": 9,
+    "name": "Dr  Liton",
+    "specialization": "ENT sergeon",
+    "email": "Liton@gmail.com",
+    "phone": "01776059944",
+    "consultation_fee": "800.00",
+    "qualification": "",
+    "experience_years": 0,
+    "bio": "",
+    "is_available": true,
+    "created_at": "2025-10-06T00:27:05.223Z"
+  }
+},
+{
+  "model": "appointments.doctor",
+  "pk": 2,
+  "fields": {
+    "user": 10,
+    "name": "Fatima Rahman",
+    "specialization": "Cardiologist",
+    "email": "fatima.rahman@hospital.com",
+    "phone": "01722222222",
+    "consultation_fee": "800.00",
+    "qualification": "",
+    "experience_years": 0,
+    "bio": "",
+    "is_available": true,
+    "created_at": "2025-10-05T19:20:00.180Z"
+  }
+},
+{
+  "model": "appointments.doctor",
+  "pk": 7,
+  "fields": {
+    "user": 1,
+    "name": "Kallyan",
+    "specialization": "General Physician",
+    "email": "Kallyan@gmail.com",
+    "phone": "017760856544",
+    "consultation_fee": "500.00",
+    "qualification": "fasdfda",
+    "experience_years": 5,
+    "bio": "fdsafads",
+    "is_available": true,
+    "created_at": "2025-10-07T14:14:17.616Z"
+  }
+},
+{
+  "model": "appointments.doctor",
+  "pk": 3,
+  "fields": {
+    "user": 11,
+    "name": "Kamal Uddin",
+    "specialization": "Pediatrician",
+    "email": "kamal.uddin@hospital.com",
+    "phone": "01733333333",
+    "consultation_fee": "600.00",
+    "qualification": "",
+    "experience_years": 0,
+    "bio": "",
+    "is_available": true,
+    "created_at": "2025-10-05T19:20:00.203Z"
+  }
+},
+{
+  "model": "appointments.doctor",
+  "pk": 4,
+  "fields": {
+    "user": 12,
+    "name": "Nazia Sultana",
+    "specialization": "Dermatologist",
+    "email": "nazia.sultana@hospital.com",
+    "phone": "01744444444",
+    "consultation_fee": "700.00",
+    "qualification": "",
+    "experience_years": 0,
+    "bio": "",
+    "is_available": true,
+    "created_at": "2025-10-05T19:20:00.224Z"
+  }
+},
+{
+  "model": "appointments.doctor",
+  "pk": 5,
+  "fields": {
+    "user": 13,
+    "name": "Rahul Das",
+    "specialization": "Orthopedic Surgeon",
+    "email": "rahul.das@hospital.com",
+    "phone": "01755555555",
+    "consultation_fee": "900.00",
+    "qualification": "",
+    "experience_years": 0,
+    "bio": "",
+    "is_available": true,
+    "created_at": "2025-10-05T19:20:00.252Z"
+  }
+}
+]
