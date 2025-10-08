@@ -27,7 +27,10 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-5sqqvzb69kttxdd*t&hh&0l(!3&+n)0133(5cl5#=os@#^6dn0')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+if 'RAILWAY_ENVIRONMENT' in os.environ:
+    DEBUG = False  # Force False in production
+else:
+    DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS configuration for Railway deployment
 if 'RAILWAY_ENVIRONMENT' in os.environ:
@@ -152,9 +155,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
+
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Static files configuration for Railway
+if 'RAILWAY_ENVIRONMENT' in os.environ:
+    # Production Railway settings
+    STATIC_ROOT = '/app/staticfiles'
+    STATICFILES_DIRS = []
+    # Ensure static directory exists for local static files
+    if os.path.exists(BASE_DIR / 'static'):
+        STATICFILES_DIRS = [BASE_DIR / 'static']
+else:
+    # Development settings
+    STATICFILES_DIRS = [BASE_DIR / 'static']
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'

@@ -91,7 +91,7 @@ def create_sample_data():
             phone='01700000001',
             bio='Experienced doctor with 10+ years in general medicine',
             experience_years=10,
-            fee=1000.00
+            consultation_fee=1000.00
         )
         print("✅ Sample doctor created")
     
