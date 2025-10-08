@@ -18,6 +18,11 @@ class ZoomService:
     def get_access_token(self):
         """Get OAuth access token using Server-to-Server OAuth"""
         try:
+            # Check if credentials are available
+            if not all([self.account_id, self.client_id, self.client_secret]):
+                print("⚠️ Zoom credentials not configured - Using manual entry mode")
+                return None
+                
             auth_string = f"{self.client_id}:{self.client_secret}"
             import base64
             auth_bytes = auth_string.encode('utf-8')
@@ -43,10 +48,11 @@ class ZoomService:
             print(f"❌ Zoom API Error: {e}")
             if e.response is not None:
                 print(f"Response: {e.response.text}")
-            print("⚠️ Please check your Zoom credentials in .env file")
+            print("⚠️ Falling back to manual meeting entry mode")
             return None
         except Exception as e:
             print(f"❌ Error getting Zoom access token: {str(e)}")
+            print("⚠️ Using manual meeting entry mode")
             return None
     
     def create_meeting(self, topic, start_time, duration=60, agenda=""):
@@ -65,7 +71,19 @@ class ZoomService:
         try:
             access_token = self.get_access_token()
             if not access_token:
-                return None
+                print("⚠️ Zoom API not available - Using manual meeting entry")
+                # Return a fallback response for manual entry
+                return {
+                    'meeting_id': f'manual_{int(time.time())}',
+                    'join_url': 'MANUAL_ENTRY_REQUIRED',
+                    'start_url': 'MANUAL_ENTRY_REQUIRED',
+                    'password': 'N/A',
+                    'topic': topic,
+                    'start_time': start_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                    'duration': duration,
+                    'status': 'manual_entry',
+                    'message': 'Doctor will provide meeting link manually'
+                }
             
             headers = {
                 'Authorization': f'Bearer {access_token}',
