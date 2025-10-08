@@ -29,7 +29,29 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-5sqqvzb69kttxdd*t&hh&0l(!3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# ALLOWED_HOSTS configuration for Railway deployment
+if 'RAILWAY_ENVIRONMENT' in os.environ:
+    # Production Railway settings
+    ALLOWED_HOSTS = [
+        'doctor-appoinment-production.up.railway.app',
+        '*.up.railway.app',
+        '*.railway.app',
+    ]
+    # Add any custom ALLOWED_HOSTS from environment
+    custom_hosts = os.getenv('ALLOWED_HOSTS', '')
+    if custom_hosts:
+        ALLOWED_HOSTS.extend(custom_hosts.split(','))
+    
+    # CSRF trusted origins for Railway
+    CSRF_TRUSTED_ORIGINS = [
+        'https://doctor-appoinment-production.up.railway.app',
+        'https://*.up.railway.app',
+        'https://*.railway.app',
+    ]
+else:
+    # Development settings
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
 
 
 # Application definition
