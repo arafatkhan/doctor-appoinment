@@ -3,7 +3,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python railway_deployment_fix.py && gunicorn appointment_system.wsgi:application --bind 0.0.0.0:$PORT",
+    "startCommand": "python railway_database_import.py && gunicorn appointment_system.wsgi:application --bind 0.0.0.0:$PORT",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
